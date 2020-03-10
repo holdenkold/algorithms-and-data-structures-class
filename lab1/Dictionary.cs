@@ -38,7 +38,7 @@ namespace ASD
             for (int i = 0; i < operations.Length; ++i)
                 switch (operations[i].oper)
                 {
-                    
+
                     case 'a':
                         res[i] = TestedDict.Add(operations[i].val);
                         break;
@@ -86,16 +86,66 @@ namespace ASD
     {
         public override bool Add(int v)
         {
+            if (head == null)
+            {
+                head = new Elem(v);
+                return true;
+            }
+            if (head.Val == v)
+                return false;
+
+            var p = head;
+            while (p.Next != null)
+            {
+                if (p.Next.Val == v)
+                    return false;
+                else
+                    p = p.Next;
+            }
+            p.Next = new Elem(v);
             return true;
         }
 
         public override bool Search(int v)
         {
+            if (head == null)
+            {
+                return false;
+            }
+            var p = head;
+            while (p != null)
+            {
+                if (p.Val == v)
+                    return true;
+                else
+                    p = p.Next;
+            }
             return false;
         }
 
         public override bool Delete(int v)
         {
+            if (head == null)
+            {
+                return false;
+            }
+            if (head.Val == v)
+            {
+                head = head.Next;
+                return true;
+            }
+
+            var p = head;
+            while (p.Next != null)
+            {
+                if (p.Next.Val == v)
+                {
+                    p.Next = p.Next.Next;
+                    return true;
+                }
+                else
+                    p = p.Next;
+            }
             return false;
         }
     }
@@ -104,17 +154,81 @@ namespace ASD
     {
         public override bool Add(int v)
         {
-            return false;
-            
+            if (head == null)
+            {
+                head = new Elem(v);
+                return true;
+            }
+            if (head.Val == v)
+            {
+                return false;
+            }
+            if (v < head.Val)
+            {
+                Elem node = new Elem(v, head);
+                head = node;
+                return true;
+            }
+            else
+            {
+                var p = head;
+                while (p.Next != null && p.Next.Val <= v)
+                {
+                    if (p.Next.Val == v)
+                        return false;
+                    p = p.Next;
+                }
+                if (p != null)
+                {
+                    Elem node = new Elem(v, p.Next);
+                    p.Next = node;
+                    return true;
+                }
+                return false;
+            }
         }
 
         public override bool Search(int v)
         {
+            if (head == null)
+            {
+                return false;
+            }
+            var p = head;
+            while (p != null && p.Val <= v)
+            {
+                if (p.Val == v)
+                    return true;
+                else
+                    p = p.Next;
+            }
             return false;
         }
 
         public override bool Delete(int v)
         {
+            if (head == null || head.Val > v)
+            {
+                return false;
+            }
+            if (head.Val == v)
+            {
+                head = head.Next;
+                return true;
+            }
+
+            var p = head;
+            while (p.Next != null)
+            {
+                if (p.Next.Val == v)
+                {
+                    p.Next = p.Next.Next;
+                    return true;
+                }
+                else
+                    p = p.Next;
+            }
+
             return false;
         }
 
@@ -122,22 +236,90 @@ namespace ASD
 
     public class MoveToHeadList : AbstractList
     {
-
         public override bool Add(int v)
         {
+            if (head == null)
+            {
+                head = new Elem(v);
+                return true;
+            }
+            if (head.Val == v)
+                return false;
+
+            var p = head;
+            while (p.Next != null)
+            {
+                if (p.Next.Val == v)
+                {
+                    var found = p.Next;
+                    p.Next = p.Next.Next;
+                    found.Next = head;
+                    head = found;
+                    return false;
+                }
+
+                else
+                    p = p.Next;
+            }
+            var node = new Elem(v, head);
+            head = node;
             return true;
         }
 
         public override bool Search(int v)
         {
+            if (head == null)
+            {
+                return false;
+            }
+            if (head.Val == v)
+                return true;
+
+            var p = head;
+            while (p.Next != null)
+            {
+                if (p.Next.Val == v)
+                {
+                    var found = p.Next;
+                    p.Next = p.Next.Next;
+                    found.Next = head;
+                    head = found;
+                    return true;
+                }
+
+                else
+                    p = p.Next;
+            }
             return false;
         }
 
         public override bool Delete(int v)
         {
+            if (head == null)
+            {
+                return false;
+            }
+            if (head.Val == v)
+            {
+                head = head.Next;
+                return true;
+            }
+
+            var p = head;
+            while (p.Next != null)
+            {
+                if (p.Next.Val == v)
+                {
+                    var found = p.Next;
+                    p.Next = p.Next.Next;
+                    return true;
+                }
+
+                else
+                    p = p.Next;
+            }
             return false;
         }
-
     }
 
 }
