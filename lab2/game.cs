@@ -31,7 +31,7 @@ namespace ASD
 
         public int OptimalStrategy(int[] numbers, out int[] moves)
         {
-            moves = null;
+            moves = new int[numbers.Length];
 
             var dp = new edge[numbers.Length][];
             for (int i = 0; i < numbers.Length; i++)
@@ -52,7 +52,7 @@ namespace ASD
                     int p1_first = numbers[i] + dp[k - 1][i + 1].p2;
                     int p1_last = numbers[i + k] + dp[k - 1][i].p2;
 
-                    if (p1_first > p1_last)
+                    if (p1_first >= p1_last)
                     {
                         dp[k][i] = new edge(p1_first, dp[k - 1][i + 1].p1, true);
                     }
@@ -62,6 +62,25 @@ namespace ASD
                     }
                 }
             }
+
+            int i1 = 0;
+            int s = 0;
+            edge p;
+            for (int k = numbers.Length - 1; k >= 0; k--, s++)
+            {
+                p = dp[k][i1];
+                if (p.take_first)
+                {
+                    moves[s] = i1;
+                    i1++;
+                }
+                else
+                {
+                    moves[s] = k;
+                }
+            }
+
+
             return dp[numbers.Length - 1][0].p1;
         }
     }

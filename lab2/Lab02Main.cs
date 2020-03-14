@@ -41,7 +41,7 @@ public class GameTestCase : TestCase
         for ( int i=0 ; i<moves.Length ; ++i )
             {
             if ( moves[i]!=first && moves[i]!=last )
-                return (Result.WrongResult, "Incorrect move: {moves[i]}");
+                return (Result.WrongResult, $"Incorrect move: {moves[i]}");
             if ( moves[i]==first ) ++first;
             if ( moves[i]==last ) --last;
             }
