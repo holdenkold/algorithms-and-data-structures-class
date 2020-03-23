@@ -76,7 +76,7 @@ namespace ASD
                 }
                 else
                 {
-                    moves[s] = k;
+                    moves[s] = k + i1;
                 }
             }
 
