@@ -4,6 +4,7 @@ namespace ASD
 using ASD.Graphs;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class Lab03 : System.MarshalByRefObject
     {
@@ -15,11 +16,9 @@ using ASD.Graphs;
             HashSet<(int, int)> connected = new HashSet<(int, int)>();
             for (int v = 0; v < graph.VerticesCount; ++v)
             {
-                var out_vers = graph.OutEdges(v);
-                foreach (Edge n in out_vers)
+                foreach (Edge n in graph.OutEdges(v))
                 {
-                    var out_vers2 = graph.OutEdges(n.To);
-                    foreach (Edge e in out_vers2)
+                    foreach (Edge e in graph.OutEdges(n.To))
                     {
                         if (e.To == v)
                             continue;
@@ -47,8 +46,27 @@ using ASD.Graphs;
     // czesc III
     public int VertexColoring(Graph graph, out int[] colors)
         {
-        colors = null;
-        return -1;
+            if (graph.Directed)
+                throw new ArgumentException();
+
+            colors = Enumerable.Repeat(-1, graph.VerticesCount).ToArray();
+            for (int v = 0; v < graph.VerticesCount; ++v)
+            {
+                if (colors[v] != -1)
+                    continue;
+                colors[v] = 0;
+                foreach (Edge n in graph.OutEdges(v))
+                {
+                    var ver = n.To;
+                    if (colors[ver] != -1)
+                    {
+                        if (colors[v] == colors[ver])
+                            colors[v]++;
+                    }
+                }
+            }
+                    
+            return colors.Max() + 1;
         }
 
     // czesc IV
