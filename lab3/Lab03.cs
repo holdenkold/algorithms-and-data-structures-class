@@ -2,14 +2,39 @@
 namespace ASD
 {
 using ASD.Graphs;
+    using System;
+    using System.Collections.Generic;
 
-public class Lab03 : System.MarshalByRefObject
+    public class Lab03 : System.MarshalByRefObject
     {
 
-    // czesc I
-    public Graph Square(Graph graph)
+        // czesc I
+        public Graph Square(Graph graph)
         {
-        return null;
+            Graph output_graph = graph.Clone();
+            HashSet<(int, int)> connected = new HashSet<(int, int)>();
+            for (int v = 0; v < graph.VerticesCount; ++v)
+            {
+                var out_vers = graph.OutEdges(v);
+                foreach (Edge n in out_vers)
+                {
+                    var out_vers2 = graph.OutEdges(n.To);
+                    foreach (Edge e in out_vers2)
+                    {
+                        if (e.To == v)
+                            continue;
+
+                        if (connected.Contains((v, e.To)) || connected.Contains((v, e.To)))
+                            continue;
+                        else
+                        {
+                            output_graph.AddEdge(v, e.To);
+                            connected.Add((v, e.To));
+                        }
+                    }
+                }
+            }
+            return output_graph;
         }
 
     // czesc II
