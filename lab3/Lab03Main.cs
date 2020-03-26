@@ -486,14 +486,14 @@ class Lab03TestModule : TestModule
 
         TestSets["LabSquareOfGraphTests"] = new TestSet(new Lab03(), "Lab. - Part 1 - square of graph");
         TestSets["LabLineGraphTests"] = new TestSet(new Lab03(), "Lab. - Part 2 - line graph");
-        TestSets["LabVertexColoringTests"] = new TestSet(new Lab03(), "Lab. - Part 3 - vertex coloring");
+        //TestSets["LabVertexColoringTests"] = new TestSet(new Lab03(), "Lab. - Part 3 - vertex coloring");
         TestSets["LabStrongEdgeColoringTests"] = new TestSet(new Lab03(), "Lab. - Part 4 - strong edge coloring");
 
         for ( int i=0 ; i<n ; ++i )
             {
             TestSets["LabSquareOfGraphTests"].TestCases.Add(new SquareofGraphTestCase(i==5?30:1, null, descriptions[i], graphs[i], squares[i]));
             TestSets["LabLineGraphTests"].TestCases.Add(new LineGraphTestCase(i==5?30:1, null, descriptions[i], graphs[i], linegraphs[i]));
-            TestSets["LabVertexColoringTests"].TestCases.Add(new VertexColoringTestCase(i==5?30:1, graphs[i].Directed?new ArgumentException():null, descriptions[i], graphs[i], chn[i], colors[i]));
+            //TestSets["LabVertexColoringTests"].TestCases.Add(new VertexColoringTestCase(i==5?30:1, graphs[i].Directed?new ArgumentException():null, descriptions[i], graphs[i], chn[i], colors[i]));
             TestSets["LabStrongEdgeColoringTests"].TestCases.Add(new StrongEdgeColoringTestCase(i==5?30:1, null, descriptions[i], graphs[i], sec_graphs[i]));
             }
 

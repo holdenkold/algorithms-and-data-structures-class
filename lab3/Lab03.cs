@@ -53,7 +53,7 @@ using ASD.Graphs;
                         }
                         else if (graph.Directed)
                         {
-                            mapping[(e.To, e.From)] = i;
+                            mapping[(e.From, e.To)] = i;
                             names[i] = (e.From, e.To);
                             i++;
                         }
@@ -68,8 +68,8 @@ using ASD.Graphs;
                     {
                         foreach (Edge s in graph.OutEdges(f.To))
                         {
-                            int from = f.To > f.From ? mapping[(f.From, f.To)] : mapping[(f.To, f.From)];
-                            int to = s.To > s.From ? mapping[(s.From, s.To)] : mapping[(s.To, s.From)];
+                            int from = mapping.ContainsKey((f.From, f.To)) ? mapping[(f.From, f.To)] : mapping[(f.To, f.From)];
+                            int to = mapping.ContainsKey((f.From, f.To)) ? mapping[(s.From, s.To)] : mapping[(s.To, s.From)];
 
                             output_graph.AddEdge(from, to);
                         }
@@ -88,7 +88,7 @@ using ASD.Graphs;
                         }
                     }
                 }
-        }
+            }
             return output_graph;
         }
 
@@ -132,13 +132,16 @@ using ASD.Graphs;
     // czesc IV
     public int StrongEdgeColoring(Graph graph, out Graph coloredGraph)
         {
-            //kolorowaniu wierzchołków kwadratu grafu krawędziowego
-            (int, int) [] names;
-            var line_graph = LineGraph(graph, out names);
-            var square_graph = Square(line_graph);
-            // coloredGraph = VertexColoring(square_graph, out int[] colors);
-            coloredGraph = null;
-            return -1;
+            coloredGraph = graph.Clone();
+            Graph line_graph = LineGraph(graph, out (int, int)[] names);
+            Graph square_graph = Square(line_graph);
+            int result = VertexColoring(square_graph, out int[] colors);
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                coloredGraph.ModifyEdgeWeight(names[i].Item1, names[i].Item2, colors[i] - 1);
+            }
+            return result;
         }
 
     }
