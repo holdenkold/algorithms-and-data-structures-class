@@ -39,7 +39,7 @@ using ASD.Graphs;
         // czesc II
         public Graph LineGraph(Graph graph, out (int x, int y)[] names)
         {
-                Dictionary<(int, int), int> mapping = new Dictionary<(int, int), int>();
+            Dictionary<(int, int), int> mapping = new Dictionary<(int, int), int>();
                 names = new (int, int)[graph.EdgesCount];
                 for (int v = 0, i = 0; v < graph.VerticesCount; ++v)
                 {
@@ -88,7 +88,7 @@ using ASD.Graphs;
                         }
                     }
                 }
-            }
+        }
             return output_graph;
         }
 
@@ -108,26 +108,37 @@ using ASD.Graphs;
             {
                 if (colors[v] != -1)
                     continue;
-                colors[v] = 0;
-                foreach (Edge n in graph.OutEdges(v))
+
+                var neigbour_colors = new SortedSet<int>();
+                foreach (var e in graph.OutEdges(v))
                 {
-                    var ver = n.To;
+                    var ver = e.To;
                     if (colors[ver] != -1)
                     {
-                        if (colors[v] == colors[ver])
-                            colors[v]++;
+                        neigbour_colors.Add(colors[ver]);
                     }
                 }
+
+                colors[v] = 0;
+                foreach (var ver in neigbour_colors)
+                {
+                    if (colors[v] == ver)
+                        colors[v]++;
+                }
             }
-                    
             return colors.Max() + 1;
         }
 
     // czesc IV
     public int StrongEdgeColoring(Graph graph, out Graph coloredGraph)
         {
-            coloredGraph = Square(graph);
-        return -1;
+            //kolorowaniu wierzchołków kwadratu grafu krawędziowego
+            (int, int) [] names;
+            var line_graph = LineGraph(graph, out names);
+            var square_graph = Square(line_graph);
+            // coloredGraph = VertexColoring(square_graph, out int[] colors);
+            coloredGraph = null;
+            return -1;
         }
 
     }
