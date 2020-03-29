@@ -24,6 +24,7 @@ class VelocityMeasurementsTestCase : TestCase
         result = isJourney ? vm.JourneyVelocities(measurements) : vm.FinalVelocities(measurements, out isBraking) ;
         }
 
+
     protected override (Result resultCode, string message) VerifyTestCase(object settings=null)
         {
         if ( expected.minVelocity!=result.minVelocity || expected.maxVelocity!=result.maxVelocity || expected.index!=result.index )
