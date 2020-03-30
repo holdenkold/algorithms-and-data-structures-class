@@ -71,31 +71,33 @@ namespace ASD
             int[] dp = new int[target + 1];
             int idx = 0;
             int value;
-            int curMaxVelocity = measurements[0];
+            int curMaxVelocity = 0;
+            int minVelocity = maxVelocity;
             for (int i = 0; i < measurements.Length; i++)
             {
+                curMaxVelocity += measurements[i];
                 for (int j = target; j >= measurements[i]; j--)
                 {
                     value = measurements[i];
                     var prev = dp[j - value];
                     if (prev + value > dp[j])
                         dp[j] = prev + value;
-                }
-            }
 
-            target = (int)(curMaxVelocity / 2);
-            int minVelocity = Math.Abs(2 * dp[target] - curMaxVelocity);
-            for (int i = 0; i < measurements.Length; i++)
-            {
-                curMaxVelocity += measurements[i];
-                target = (int)(curMaxVelocity / 2);
-                if (dp[i] < minVelocity)
-                {
-                    idx = i;
-                    minVelocity = Math.Min(minVelocity, Math.Abs(2 * dp[i] - curMaxVelocity));
+                    if (j == (int)curMaxVelocity / 2)
+                    {
+                        var min = Math.Abs(2 * dp[j] - curMaxVelocity);
+                        if (min == 0)
+                            return (0, maxVelocity, i + 1);
+                        if (min < minVelocity)
+                        {
+                            minVelocity = min;
+                            idx = i;
+                        }
+
+                    }
                 }
             }
-            return (minVelocity, measurements.Sum(), idx);
+            return (minVelocity, maxVelocity, idx + 1);
         }
 
     }
