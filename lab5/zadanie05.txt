@@ -1,0 +1,72 @@
+
+Wiadomo, jak w grafie z wagami na krawędziach znaleźć najkrótszą ścieżkę między wskazanymi wierzchołkami.
+Jeśli wszystkie wagi w grafie są nieujemne, możemy użyć np. algorytmu Dijkstry.
+Algorytm działa zarówno dla grafów skierowanych i nieskierowanych.
+
+Na zajęciach rozpatrzymy inny, choć podobny problem. Naszym celem jest znalezienie *drugiej*
+pod względem długości ścieżki między wskazanymi wierzchołkami. Znowu chcemy znaleźć algorytm działający
+zarówno dla grafów skierowanych i nieskierowanych.
+
+Zwróćmy uwagę, że może się zdarzyć, że:
+a) druga najkrótsza ścieżka nie istnieje (nawet jeśli najkrótsza ścieżka istnieje), np. jeśli graf jest
+skierowaną ścieżką 0 -> 1 -> 2, istnieje tylko jedna ścieżka od 0 do 2.
+b) druga najkrótsza ścieżka ma taką samą długość jak najkrótsza, np. jeśli graf jest cyklem nieskierowanym 0,1,2,3
+o jednakowych wagach wszystkich krawędzi i szukamy ścieżek od 1 do 3.
+
+UWAGA: można założyć, że:
+- graf nie ma pętli, tj. krawędzi od wierzchołka do niego samego
+- wierzchołek początkowy jest różny od wierzchołka końcowego
+- graf nie ma krawędzi o ujemnych wagach
+
+
+Problem rozważamy w dwóch wariantach:
+
+1. Metoda FindSecondShortestPath
+Na ścieżce dopuszczamy powtórzenia wierzchołków i krawędzi (zauważ, że taka sytuacja nigdy
+nie będzie miała miejsca w przypadku szukania *najkrótszej ścieżki*).
+Przy liczeniu długości ścieżki liczy się jednak pierwszy moment osiągnięcia wierzchołka końcowego.
+Innymi słowy, wymagamy, aby wierzchołek końcowy występował na ścieżce tylko raz, na końcu
+(czyli nie można dojść z a do b najkrótszą ścieżką, a potem pochodzić po okolicy).
+
+2. Metoda FindSecondSimpleShortestPath
+Znaleziona ścieżka musi być prosta, tj. nie zawierać powtórzeń wierzchołków.
+
+
+Uwagi, podpowiedzi i wymagana złozoność:
+
+Wariant 1.
+Niech P1 będzie najkrótszą ścieżką od a do b, a P2 będzie szukaną drugą ścieżką.
+Zauważ, że P2 musi jakoś różnić się od P1, czyli idąc wzdłuż P1 na którymś wierzchołku (być może już na pierwszym)
+musimy wybrać inną krawędź niż wybraliśmy w P1.
+
+Wymagana złożoność obliczeniowa to O(D), gdzie D jest złożonością implementacji algorytmu Dijkstry z biblioteki Graph.
+
+Wariant 2.
+Niech P1 będzie najkrótszą ścieżką od a do b, a P2 będzie szukaną drugą ścieżką.
+W tym wariancie również gdzieś musimy dokonać innego wyboru niż na ścieżce P1. Musimy jednak zadbać,
+aby fragment scieżki P2 "od pierwszej różnicy" nie zawierał wierzchołków ze "wspólnej części" ścieżek P1 i P2.
+
+Wymagana złożoność obliczeniowa to O(n*D), gdzie D jest złożonością implementacji algorytmu Dijkstry z biblioteki Graph,
+a n liczbą wierzchołków w grafie.
+
+Uwagi techniczne.
+
+1) Przypominamy, że gdy odpowiednia krawędź/ścieżka nie istnieje, to jej waga jest równa NaN,
+co można sprawdzić przy użyciu metody IsNaN.
+
+2) Można korzystać z dostępnych w bibliotece metod znajdywania najktótszych ścieżek.
+
+3) Może się przydać odwrócenie kierunków krawędzi (wariant 1)
+
+4) Prostym sposobem, zabronienia korzystania z jakiejś krawędzi jest ... usunięcie jej z grafu (wariant 2).
+(Oczywiście to tylko idea, grafu nie wolno modyfikować.)
+
+
+Punktacja:
+Za każdy wariant:
+ 0.0 - jakikolwiek błąd w znanych testach
+ 0.5 - znane testy poprawne, w nieznanych testach jakikolwiek błąd inny niż timeout lub więcej niż 3 timeout'y
+ 1.0 - znane testy poprawne, w nieznanych testach 3 lub mniej timeout'y (i zadnych innych błędów)
+ 1.5 - wszystkie testy poprawne
+W przypadku niedotrzymmania wymagań dotyczących złożoności punktacja może zostać obniżona (nawet jeśli nie
+spowodowało to timeout'ów).
