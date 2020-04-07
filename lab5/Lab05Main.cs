@@ -59,7 +59,7 @@ abstract class BasicSecondPathTestCase : TestCase
             if ( e.From==b )
                 return (Result.WrongResult,"destination vertex appears inside the path");
             if ( !g.OutEdges(e.From).Contains(e) )
-                return (Result.WrongResult,"edge {e} does not exist");
+                return (Result.WrongResult,$"edge {e} does not exist");
             if ( first )
                 first = false;
             else
