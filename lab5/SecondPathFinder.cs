@@ -23,6 +23,27 @@ public class PathFinder : System.MarshalByRefObject
             return path;
         }
 
+        public Graph ReverseGraph(Graph g)
+        {
+            Graph graph = g.IsolatedVerticesGraph();
+            for (int i = 0; i < g.VerticesCount; i++)
+            {
+                foreach (var e in g.OutEdges(i))
+                {
+                    graph.AddEdge(e.To, e.From, e.Weight);
+                }
+            }
+            return graph;
+        }
+
+        public PathsInfo[] ChceckDijkstraPath(Graph g, Edge to_delete, int v)
+        {
+            g.DelEdge(to_delete);
+            g.DijkstraShortestPaths(v, out PathsInfo[] paths);
+            g.AddEdge(to_delete);
+            return paths;
+        }
+
         /// <summary>
         /// Algorytm znajdujący drugą pod względem długości najkrótszą ścieżkę między a i b.
         /// Możliwe, że jej długość jest równa najkrótszej (jeśli są dwie najkrótsze ścieżki, algorytm zwróci jedną z nich).
@@ -37,8 +58,13 @@ public class PathFinder : System.MarshalByRefObject
         /// <returns>null jeśli druga ścieżka nie istnieje, wpp długość znalezionej ścieżki</returns>
         public double? FindSecondShortestPath(Graph g, int a, int b, out Edge[] path)
         {
+            Graph graph = g;
             path = null;
-            g.DijkstraShortestPaths(b, out PathsInfo[] paths);
+            if (g.Directed)
+            {
+                graph = ReverseGraph(g); 
+            }
+            graph.DijkstraShortestPaths(b, out PathsInfo[] paths);
 
             if (double.IsNaN(paths[a].Dist))
                 return null;
@@ -83,7 +109,7 @@ public class PathFinder : System.MarshalByRefObject
             }
          
             System.Console.WriteLine("Path len is:" + second_min_path_len.ToString());
-            if (second_min_path.Count != 0)
+            if (second.Count != 0)
             {
                 path = second.ToArray();
                 return second_min_path_len;
@@ -106,8 +132,63 @@ public class PathFinder : System.MarshalByRefObject
     /// <returns>null jeśli druga ścieżka nie istnieje, wpp długość tej ścieżki</returns>
     public double? FindSecondSimpleShortestPath(Graph g, int a, int b, out Edge[] path)
         {
-        path = null;
-        return -1.0;
+            Graph graph = g.Clone();
+            path = null;
+            if (g.Directed)
+            {
+                graph = ReverseGraph(g);
+            }
+            graph.DijkstraShortestPaths(b, out PathsInfo[] paths);
+
+            if (double.IsNaN(paths[a].Dist))
+                return null;
+
+            List<Edge> min_path = CalculateMinPath(a, b, paths);
+
+            double min_path_len = paths[b].Dist;
+            double second_min_path_len = double.MaxValue;
+            List<Edge> second_min_path = new List<Edge>();
+            List<Edge> second = new List<Edge>();
+
+            double curr_len = 0;
+
+            foreach (var edge in min_path)
+            {
+                paths = ChceckDijkstraPath(graph, new Edge(edge.To, edge.From, edge.Weight), b); //e.from
+                if (paths[edge.From].Dist + curr_len < second_min_path_len)
+                {
+                    second_min_path_len = paths[edge.From].Dist + curr_len;
+
+                    second = new List<Edge>();
+                    foreach (var el in second_min_path)
+                        second.Add(el);
+
+                    int v = edge.From;
+                    while (paths[v].Last.HasValue)
+                    {
+                        Edge reversed = paths[v].Last.Value;
+                        second.Add(new Edge(reversed.To, reversed.From, reversed.Weight));
+                        v = paths[v].Last.Value.From;
+                    }
+                    if (second_min_path_len == min_path_len)
+                    {
+                        path = second.ToArray();
+                        return second_min_path_len;
+                    }
+
+                }
+                curr_len += edge.Weight;
+                second_min_path.Add(edge);
+            }
+
+            System.Console.WriteLine("Path len is:" + second_min_path_len.ToString());
+            if (second.Count != 0)
+            {
+                path = second.ToArray();
+                return second_min_path_len;
+            }
+            else
+                return null;
         }
 
     }
