@@ -7,25 +7,21 @@ namespace Lab06
 
     public class SmellsChecker : MarshalByRefObject
     {
-        private bool solveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int not_used)
+        private bool solveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
         {
-            System.Console.WriteLine($"Called function for not_used: {not_used}");
             if (Array.TrueForAll(satisfactions, el => el >= satisfactionLevel))
                 return true;
 
-            if (not_used <= 0)
-                return false;
-
-            for (int idx = 0; idx < smells.Length; idx++)
+            for (int idx = used; idx < smells.Length; idx++)
             {
-                if (smells[idx])
-                    continue;
-
                 smells[idx] = true;
                 for (int i = 0; i < customerPreferences.Length; i++)
+                {
+                    var add = customerPreferences[i][idx];
                     satisfactions[i] += customerPreferences[i][idx];
+                }
 
-                if (solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, not_used - 1))
+                if (solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1))
                     return true;
 
                 smells[idx] = false;
@@ -35,6 +31,35 @@ namespace Lab06
             }
             return false;
         }
+
+        private int maxsolveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
+        {
+            int max_client = satisfactions.Count(p => p >= satisfactionLevel);
+            if (max_client == customerPreferences.Length)
+                return max_client;
+
+            for (int idx = used; idx < smells.Length; idx++)
+            {
+                smells[idx] = true;
+                for (int i = 0; i < customerPreferences.Length; i++)
+                    satisfactions[i] += customerPreferences[i][idx];
+
+                int curr_max = maxsolveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1);
+                if (curr_max > max_client)
+                    max_client = curr_max;
+
+                if (max_client == customerPreferences.Length)
+                    return max_client;
+
+                smells[idx] = false;
+                for (int i = 0; i < customerPreferences.Length; i++)
+                    satisfactions[i] -= customerPreferences[i][idx];
+            }
+
+            return max_client;
+        }
+
+
         /// <summary>
         /// Implementacja etapu 1
         /// </summary>
@@ -53,10 +78,10 @@ namespace Lab06
         /// <param name="smells">Wyjściowa tablica rozpylonych zapachów realizująca rozwiązanie, jeśli się da. null w p.p. </param>
         public bool AssignSmells(int smellCount, int[][] customerPreferences, int satisfactionLevel, out bool[] smells)
         {
-            int not_used = smellCount;
+            int used = 0;
             smells = new bool[smellCount];
             var satisfactions = new int[customerPreferences.Length];
-            bool can_assign = solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, not_used);
+            bool can_assign = solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, used);
             if (!can_assign)
                 smells = null;
             return can_assign;
@@ -81,11 +106,13 @@ namespace Lab06
         /// <param name="smells">Wyjściowa tablica rozpylonych zapachów, realizująca wyliczony poziom satysfakcji</param>
         public int AssignSmellsMaximizeHappyCustomers(int smellCount, int[][] customerPreferences, int satisfactionLevel, out bool[] smells)
         {
-            smells = null;
-            return -1;
+            int used = 0;
+            smells = new bool[smellCount];
+            var satisfactions = new int[customerPreferences.Length];
+            int max_clients = maxsolveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, used);
+            System.Console.WriteLine($"return value is {max_clients}");
+            return max_clients;
         }
-
-
     }
 }
 
