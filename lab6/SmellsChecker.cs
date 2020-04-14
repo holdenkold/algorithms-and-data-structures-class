@@ -101,13 +101,13 @@ namespace Lab06
 
         public bool maxMoveMakeSense(int used, int[][] customerPreferences, int[] satisfactions, int satisfactionLevel, int max_clients)
         {
-            int unsatisafacted_clients = 0;
+            int unsatisfied = 0;
             for (int i = 0; i < customerPreferences.Length; i++)
             {
                 if (satisfactions[i] + customerPreferences[i].Skip(used).Count(e => e == 1) < satisfactionLevel)
-                    unsatisafacted_clients += 1;
+                    unsatisfied += 1;
             }
-            return satisfactions.Length - max_clients > unsatisafacted_clients;
+            return satisfactions.Length - max_clients > unsatisfied;
         }
 
         public int maxsolveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, bool[] max_smells, int max_clients, int used)
