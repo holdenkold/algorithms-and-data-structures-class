@@ -9,8 +9,15 @@ namespace Lab06
     {
         private bool solveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
         {
-            if (Array.TrueForAll(satisfactions, el => el >= satisfactionLevel))
+            for (int i = 0; i < customerPreferences.Length; i++)
+            {
+                if (satisfactions[i] + customerPreferences[i].Count(e => e == 1) < satisfactionLevel)
+                    return false;
+            }
+
+            if (satisfactions.All(el => el >= satisfactionLevel))
                 return true;
+
 
             for (int idx = used; idx < smells.Length; idx++)
             {
@@ -21,8 +28,9 @@ namespace Lab06
                     satisfactions[i] += customerPreferences[i][idx];
                 }
 
-                if (solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1))
-                    return true;
+                if (satisfactions.All(el => el + smells.Length - 1 - used >= satisfactionLevel))
+                    if (solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1))
+                        return true;
 
                 smells[idx] = false;
                 for (int i = 0; i < customerPreferences.Length; i++)
@@ -32,7 +40,8 @@ namespace Lab06
             return false;
         }
 
-        private int maxsolveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
+
+        private int maxsolveAssignSmells_old(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
         {
             int max_client = satisfactions.Count(p => p >= satisfactionLevel);
             if (max_client == customerPreferences.Length)
@@ -44,9 +53,11 @@ namespace Lab06
                 for (int i = 0; i < customerPreferences.Length; i++)
                     satisfactions[i] += customerPreferences[i][idx];
 
-                int curr_max = maxsolveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1);
+                int curr_max = maxsolveAssignSmells_old(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1);
                 if (curr_max > max_client)
+                {
                     max_client = curr_max;
+                }
 
                 if (max_client == customerPreferences.Length)
                     return max_client;
@@ -55,9 +66,39 @@ namespace Lab06
                 for (int i = 0; i < customerPreferences.Length; i++)
                     satisfactions[i] -= customerPreferences[i][idx];
             }
-
             return max_client;
         }
+
+        //private (int, HashSet<int>) maxsolveAssignSmells(int smellCount, int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, int used)
+        //{
+        //    HashSet<int> smells = new HashSet<int>();
+        //    if (used < smellCount)
+        //        smells.Add(used);
+
+        //    int max_client = satisfactions.Count(p => p >= satisfactionLevel);
+        //    if (max_client == customerPreferences.Length)
+        //        return (max_client, smells);
+
+        //    for (int idx = used; idx < smellCount; idx++)
+        //    {
+        //        for (int i = 0; i < customerPreferences.Length; i++)
+        //            satisfactions[i] += customerPreferences[i][idx];
+
+        //        var (currmax, maxsmell) = maxsolveAssignSmells(smellCount, satisfactions, customerPreferences, satisfactionLevel, idx + 1);
+        //        if (currmax > max_client)
+        //        {
+        //            foreach (var el in maxsmell)
+        //            {
+        //                smells.Add(el);
+        //            }
+        //            max_client = currmax;
+        //        }
+
+        //        for (int i = 0; i < customerPreferences.Length; i++)
+        //            satisfactions[i] -= customerPreferences[i][idx];
+        //    }
+        //    return (max_client, smells);
+        //}
 
 
         /// <summary>
@@ -78,10 +119,10 @@ namespace Lab06
         /// <param name="smells">Wyjściowa tablica rozpylonych zapachów realizująca rozwiązanie, jeśli się da. null w p.p. </param>
         public bool AssignSmells(int smellCount, int[][] customerPreferences, int satisfactionLevel, out bool[] smells)
         {
-            int used = 0;
-            smells = new bool[smellCount];
             var satisfactions = new int[customerPreferences.Length];
-            bool can_assign = solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, used);
+            smells = new bool[smellCount];
+
+            bool can_assign = solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, 0);
             if (!can_assign)
                 smells = null;
             return can_assign;
@@ -109,7 +150,15 @@ namespace Lab06
             int used = 0;
             smells = new bool[smellCount];
             var satisfactions = new int[customerPreferences.Length];
-            int max_clients = maxsolveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, used);
+            int max_clients = maxsolveAssignSmells_old(satisfactions, customerPreferences, satisfactionLevel, smells, used);
+            //int max_clients;
+            //HashSet<int> assigned;
+            //(max_clients, assigned) = maxsolveAssignSmells(smellCount, satisfactions, customerPreferences, satisfactionLevel, used);
+            //foreach (var idx in assigned)
+            //{
+            //    smells[idx] = true;
+            //}
+            //int max_client = customerPreferences.Count(pref => pref.Sum(i => i < 0 ? (smells[-i - 1] ? -1 : 0) : (smells[i - 1] ? 1 : 0)) >= satisfactionLevel)
             System.Console.WriteLine($"return value is {max_clients}");
             return max_clients;
         }
