@@ -27,29 +27,19 @@ namespace Lab06
         {
             var satisfactions = new int[customerPreferences.Length];
             smells = new bool[smellCount];
-
-            bool can_assign = solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, 0);
+            fill_memory(customerPreferences, out int[,] memorisation, smellCount);
+            bool can_assign = solveAssignSmells(satisfactions, memorisation, customerPreferences, satisfactionLevel, smells, 0);
             if (!can_assign)
                 smells = null;
             return can_assign;
         }
 
-        public bool moveMakeSense(int used, int[][] customerPreferences, int[] satisfactions, int satisfactionLevel)
-        {
-            for (int i = 0; i < customerPreferences.Length; i++)
-            {
-                if (satisfactions[i] + customerPreferences[i].Skip(used).Count(e => e == 1) < satisfactionLevel)
-                    return false;
-            }
-            return true;
-        }
-
-        public bool solveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
+        public bool solveAssignSmells(int[] satisfactions, int[,] memorisation, int[][] customerPreferences, int satisfactionLevel, bool[] smells, int used)
         {
             if (satisfactions.All(el => el >= satisfactionLevel))
                 return true;
 
-            if (!moveMakeSense(used, customerPreferences, satisfactions, satisfactionLevel))
+            if (!moveMakeSense(used, memorisation, customerPreferences, satisfactions, satisfactionLevel))
                 return false;
 
             for (int idx = used; idx < smells.Length; idx++)
@@ -59,7 +49,7 @@ namespace Lab06
                     satisfactions[i] += customerPreferences[i][idx];
 
                 if (satisfactions.All(el => el + smells.Length - 1 - used >= satisfactionLevel))
-                    if (solveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, idx + 1))
+                    if (solveAssignSmells(satisfactions, memorisation, customerPreferences, satisfactionLevel, smells, idx + 1))
                         return true;
 
                 smells[idx] = false;
@@ -68,6 +58,30 @@ namespace Lab06
 
             }
             return false;
+        }
+
+        public void fill_memory(int[][] customerPreferences, out int[,] memorisation, int smellCount)
+        {
+            int n = customerPreferences.Length;
+            memorisation = new int[n, smellCount + 1];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = smellCount - 1; j >= 0; j--)
+                {
+                    memorisation[i, j] = memorisation[i, j + 1];
+                    if (customerPreferences[i][j] == 1)
+                        memorisation[i, j] += 1;
+                }
+            }
+        }
+        public bool moveMakeSense(int used, int[,] memorisation, int[][] customerPreferences, int[] satisfactions, int satisfactionLevel)
+        {
+            for (int i = 0; i < customerPreferences.Length; i++)
+            {
+                if (satisfactions[i] + memorisation[i, used] < satisfactionLevel)
+                    return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -94,25 +108,15 @@ namespace Lab06
             smells = new bool[smellCount];
 
             var satisfactions = new int[customerPreferences.Length];
-            int max_clients = maxsolveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, temp_smells, smells, 0, used);
+            fill_memory(customerPreferences, out int[,] memorisation, smellCount);
+            int max_clients = maxsolveAssignSmells(satisfactions, memorisation, customerPreferences, satisfactionLevel, temp_smells, smells, 0, used);
             System.Console.WriteLine($"return value is {max_clients}");
             return max_clients;
         }
 
-        public bool maxMoveMakeSense(int used, int[][] customerPreferences, int[] satisfactions, int satisfactionLevel, int max_clients)
+        public int maxsolveAssignSmells(int[] satisfactions, int[,] memorisation, int[][] customerPreferences, int satisfactionLevel, bool[] smells, bool[] max_smells, int max_clients, int used)
         {
-            int unsatisfied = 0;
-            for (int i = 0; i < customerPreferences.Length; i++)
-            {
-                if (satisfactions[i] + customerPreferences[i].Skip(used).Count(e => e == 1) < satisfactionLevel)
-                    unsatisfied += 1;
-            }
-            return satisfactions.Length - max_clients > unsatisfied;
-        }
-
-        public int maxsolveAssignSmells(int[] satisfactions, int[][] customerPreferences, int satisfactionLevel, bool[] smells, bool[] max_smells, int max_clients, int used)
-        {
-            if (!maxMoveMakeSense(used, customerPreferences, satisfactions, satisfactionLevel, max_clients))
+            if (!maxMoveMakeSense(used, memorisation, customerPreferences, satisfactions, satisfactionLevel, max_clients))
                 return max_clients;
 
             int max_client = satisfactions.Count(p => p >= satisfactionLevel);
@@ -133,7 +137,7 @@ namespace Lab06
                 for (int i = 0; i < customerPreferences.Length; i++)
                     satisfactions[i] += customerPreferences[i][idx];
 
-                int curr_max = maxsolveAssignSmells(satisfactions, customerPreferences, satisfactionLevel, smells, max_smells, max_clients, idx + 1);
+                int curr_max = maxsolveAssignSmells(satisfactions, memorisation, customerPreferences, satisfactionLevel, smells, max_smells, max_clients, idx + 1);
                 if (curr_max > max_clients)
                     max_clients = curr_max;
 
@@ -150,6 +154,19 @@ namespace Lab06
 
             return max_clients;
         }
+
+        public bool maxMoveMakeSense(int used, int[,] memorisation, int[][] customerPreferences, int[] satisfactions, int satisfactionLevel, int max_clients)
+        {
+            int unsatisfied = 0;
+            for (int i = 0; i < customerPreferences.Length; i++)
+            {
+                if (satisfactions[i] + memorisation[i, used] < satisfactionLevel)
+                    unsatisfied += 1;
+            }
+            return satisfactions.Length - max_clients > unsatisfied;
+        }
+
+
 
     }
 }
