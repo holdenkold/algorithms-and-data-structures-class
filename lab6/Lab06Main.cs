@@ -252,23 +252,23 @@ namespace Lab06
                 new int[]{ 1, 2, -3, -4, 5, 6, 7, 8, 9 }
                 };
 
-            //Test 1
+            ////Test 1
             existenceTests.TestCases.Add(new ExistenceTestCase(test1, 3, 1, true, 1, "Prosty test możliwy"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test1, 3, 2, false, 1, "Prosty test niemożliwy"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test2, 3, 1, false, 1, "Prosty test przeciwne preferencje"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test6, 10, 3, true, 1, "10 zapachów"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test3a, 24, 1, false, 1, "sąsiedni klienci niezgodni"));
-            //Test6
+            ////Test6
             existenceTests.TestCases.Add(new ExistenceTestCase(testNeg, 24, 1, false, 1, "klienci wiecznie niezadowoleni"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test4, 50, 0, true, 1, "wymagany poziom 0"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test3, 50, 1, false, 1, "niemożliwy 50"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test4, 50, 1, true, 1, "klienci 2×tak, 1×nie"));
             existenceTests.TestCases.Add(new ExistenceTestCase(test4, 50, 2, false, 1, "klienci 2×tak, 1×nie niemożliwy"));
-            //Test 11
+            ////Test 11
             existenceTests.TestCases.Add(new ExistenceTestCase(test5, 21, 2, true, 1, "niektórzy klienci wybredni"));
 
 
-            // Test 1
+            //// Test 1
             optimizeTest.TestCases.Add(new OptimizeTestCase(test1, 3, 1, 3, 1, "prosty wszyscy"));
             optimizeTest.TestCases.Add(new OptimizeTestCase(test1, 3, 2, 2, 1, "prosty bez jednego"));
             optimizeTest.TestCases.Add(new OptimizeTestCase(test1, 3, 5, 0, 1, "prosty nikt"));
@@ -297,7 +297,6 @@ namespace Lab06
 
     public class Program
     {
-
         public static void Main(string[] args)
         {
             var tests = new SmellTests();
