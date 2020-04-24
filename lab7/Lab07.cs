@@ -60,35 +60,27 @@ namespace ASD
 
 
             exampleSolution = new List<int>();
-            int right = a[a.Length - 1];
-            int left = a[0];
-            int mid;
-            int maxDist = 0;
             List<int> solution;
-            while (left <= right)
-            {
-                mid = (right + left) / 2;
+            int max_dist = int.MaxValue;//a[a.Length - 1];
+            int min_dist = 0; //max_dist / k;
+            int dist;
 
-                if (CanPlaceBuildingsInDistance(a, mid, k, out solution))
+
+            while (min_dist < max_dist)
+            {
+                dist = (max_dist + min_dist) / 2;
+
+                if (CanPlaceBuildingsInDistance(a, dist, k, out solution))
                 {
-                    if (mid > maxDist)
-                    {
-                        exampleSolution = solution;
-                        maxDist = mid;
-                    }
-                    left = mid + 1;
+                    exampleSolution = solution;
+                    min_dist = dist + 1;
                 }
                 else
                 {
-                    right = mid - 1;
+                    max_dist = dist;
                 }
             }
-            if (maxDist == 0)
-            {
-                for (int i = 0; i < k; i++)
-                    exampleSolution.Add(a[0]);
-            }
-            return maxDist;
+            return max_dist - 1;
         }
 
     }
