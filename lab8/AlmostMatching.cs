@@ -28,7 +28,7 @@ public class AlmostMatching : MarshalByRefObject
         class OptimiseDryer
         {
             private Graph graph;
-            private int [] assigned;
+            private int[] assigned;
             private int k;
             public List<Edge> solution;
             private double solutionWeight;
@@ -57,31 +57,31 @@ public class AlmostMatching : MarshalByRefObject
             }
             public void solveLargestS(int idx, Edge[] available, List<Edge> placements, double placementWeight)
             {
-                if (solution.Count >= placements.Count && placementWeight > solutionWeight)
+                if (solution.Count >= placements.Count && placementWeight >= solutionWeight)
                     return;
 
-                if (idx == available.Length && placementWeight < solutionWeight)
+                if (idx == available.Length)
                 {
-                    solutionWeight = placementWeight;
-                    solution = placements;
+                    if (placementWeight < solutionWeight)
+                    {
+                        solutionWeight = placementWeight;
+                        solution = new List<Edge>(placements);
+                        //solutionWeight = placementWeight;
+                        //solution = placements;
+                    }
+                    return;
                 }
 
-                bool end = true;
-                for (int i = idx; i < available.Length; i++)
+                //if (available.Length + placementWeight - idx < solution.Count)
+                //    return;
+
+                assign(available[idx], placements);
+                if (isValid(available[idx]))
                 {
-                    assign(available[i], placements);
-                    if (isValid(available[i]))
-                    {
-                        end = false;
-                        solveLargestS(idx+1, available, placements, placementWeight + available[i].Weight);
-                    }
-                    unassign(available[i], placements);
+                    solveLargestS(idx + 1, available, placements, placementWeight + available[idx].Weight);
                 }
-                if (end && solution.Count <= placements.Count &&  placementWeight < solutionWeight)
-                {
-                    solutionWeight = placementWeight;
-                    solution =  new List<Edge>(placements);   
-                }
+                unassign(available[idx], placements);
+                solveLargestS(idx + 1, available, placements, placementWeight + available[idx].Weight);
             }
 
             private void assign(Edge e, List<Edge> placements)
