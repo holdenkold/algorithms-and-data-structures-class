@@ -5,7 +5,7 @@ using ASD.Graphs;
 
 namespace lab08
 {
-public class AlmostMatching : MarshalByRefObject
+    public class AlmostMatching : MarshalByRefObject
     {
 
         /// <summary>
@@ -21,7 +21,7 @@ public class AlmostMatching : MarshalByRefObject
                 return (0, null);
 
             OptimiseDryer od = new OptimiseDryer(g, allowedCollisions);
-            od.solveLargestS(0, od.edgeSet, new List<Edge>(), 0);
+            od.solveLargestS(0, od.edgeSet, new List<Edge>(), 0, 0);
             return (od.solution.Count, od.solution);
         }
 
@@ -55,40 +55,46 @@ public class AlmostMatching : MarshalByRefObject
                     }
                 }
             }
-            public void solveLargestS(int idx, Edge[] available, List<Edge> placements, double placementWeight)
+            public void solveLargestS(int idx, Edge[] available, List<Edge> placements, double placementWeight, int currentK)
             {
-                if (solution.Count >= placements.Count && placementWeight >= solutionWeight)
-                    return;
 
                 if (idx == available.Length)
                 {
-                    if (placementWeight < solutionWeight)
+                    if (placements.Count > solution.Count || (placements.Count == solution.Count && placementWeight < solutionWeight))
                     {
                         solutionWeight = placementWeight;
                         solution = new List<Edge>(placements);
-                        //solutionWeight = placementWeight;
-                        //solution = placements;
                     }
                     return;
                 }
 
-                //if (available.Length + placementWeight - idx < solution.Count)
-                //    return;
+                if (available.Length - idx < solution.Count - placements.Count)
+                    return;
 
-                assign(available[idx], placements);
-                if (isValid(available[idx]))
+
+                int p = assign(available[idx], placements);
+                currentK += p;
+                if (isValid(currentK))
                 {
-                    solveLargestS(idx + 1, available, placements, placementWeight + available[idx].Weight);
+                    solveLargestS(idx + 1, available, placements, placementWeight + available[idx].Weight, currentK);
                 }
                 unassign(available[idx], placements);
-                solveLargestS(idx + 1, available, placements, placementWeight + available[idx].Weight);
+                currentK -= p;
+                solveLargestS(idx + 1, available, placements, placementWeight, currentK);
+
             }
 
-            private void assign(Edge e, List<Edge> placements)
+            private int assign(Edge e, List<Edge> placements)
             {
-                assigned[e.To]+= 1;
+                int x = 0;
+                assigned[e.To] += 1;
+                if (assigned[e.To] > 1)
+                    x++;
                 assigned[e.From] += 1;
+                if (assigned[e.From] > 1)
+                    x++;
                 placements.Add(e);
+                return x;
             }
             private void unassign(Edge e, List<Edge> placements)
             {
@@ -96,7 +102,10 @@ public class AlmostMatching : MarshalByRefObject
                 assigned[e.From] -= 1;
                 placements.RemoveAt(placements.Count - 1);
             }
-            private bool isValid(Edge e) => assigned[e.To] <= k + 1 && assigned[e.From] <= k + 1;
+            private bool isValid(int currentK)
+            {
+                return currentK <= k;
+            }
         }
     }
 }
