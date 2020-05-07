@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using ASD.Graphs;
 
 namespace Lab09
@@ -27,7 +29,6 @@ namespace Lab09
         public int FindRoutes(Graph g, int[] levels, int[] entrances, int[] exits, out int[][] routes)
         {
             Graph flow_graph = g.IsolatedVerticesGraph(true, g.VerticesCount * 2 + 2);
-            //Dictionary<int, Edge> map = new Dictionary<int, Edge>();
             int source = flow_graph.VerticesCount - 2;
             int target = flow_graph.VerticesCount - 1;
 
@@ -35,20 +36,12 @@ namespace Lab09
             {
                 Edge e = new Edge(i, i + g.VerticesCount, levels[i]);
                 flow_graph.AddEdge(e);
-                //map.Add(i, e);
-                // Console.WriteLine(e.From.ToString() + "-" + e.To.ToString());
-            }
 
-            for (int i = 0; i < g.VerticesCount; i++)
-            {
-                foreach (var e in g.OutEdges(i))
+                foreach (var edge in g.OutEdges(i))
                 {
-                    //var from = map[i].To;
-                    //var to = map[e.To].From;
                     var from = i + g.VerticesCount;
-                    var to = e.To;
+                    var to = edge.To;
                     flow_graph.AddEdge(from, to, int.MaxValue);
-                    //Console.WriteLine("i: "+ i.ToString() +", " + from.ToString() + "-" + to.ToString());
                 }
             }
 
@@ -61,30 +54,42 @@ namespace Lab09
             Graph flow;
             double max_flow = int.MinValue;
 
-            (max_flow, flow) = flow_graph.FordFulkersonDinicMaxFlow(source, target, MaxFlowGraphExtender.BFPath, true);
-
-            routes = null;
-            //int routes_count = 0;
-            //routes = new int[][];
-            //foreach (var s in entrances)
-            //{
-            //    Stack<int> to_see = new Stack<int>();
-            //    to_see.Push(s);
-
-            //    while (to_see.Count > 0)
-            //    {
-            //        var v = to_see.Pop();
-            //        foreach (var e in flow.OutEdges(v).Where(e => e.Weight > 0))
-            //        {
-            //            routes_count += 1;
-            //            to_see.Push(e.To);
-            //        }
-            //    }
-            //}
+            (max_flow, flow) = flow_graph.FordFulkersonDinicMaxFlow(source, target, MaxFlowGraphExtender.OriginalDinicBlockingFlow, false);
+            List<int[]> paths = new List<int[]>();
+            int idx = 0;
+            foreach (var s in entrances)
+            {
+                findFlows(s, paths, exits, flow, new List<int> { s }, g.VerticesCount, idx, (int)flow.GetEdgeWeight(s, s + g.VerticesCount));
+            }
+            routes = paths.ToArray();
+            //Console.WriteLine(routes.Length.ToString() + " " + max_flow.ToString());
             return (int)max_flow;
+        }
+        private void findFlows(int s, List<int[]> paths, int[] targets, Graph flow, List<int> path, int map, int idx, int times)
+        {
+            if (targets.Contains(s))
+            {
+                var w = Math.Min(flow.GetEdgeWeight(s, s + map), times);
+                for (int i = 0; i < w; i++)
+                {
+                    paths.Add(path.ToArray());
+                    foreach (var el in path)
+                    {
+                        flow.ModifyEdgeWeight(el, el + map, -1);
+                    }
+                }
+                return;
+            }
+
+            foreach (var e in flow.OutEdges(s + map).Where(e => e.Weight > 0))
+            {
+                path.Add(e.To);
+                findFlows(e.To, paths, targets, flow, path, map, idx, Math.Min((int)e.Weight, times));
+                idx += 1;
+                path.RemoveAt(path.Count - 1);
+            }
         }
 
     }
 
 }
-

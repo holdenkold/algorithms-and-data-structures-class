@@ -143,25 +143,25 @@ public class RoutesTests : TestModule
         disjunction.AddEdge(2, 3);
         disjunction.AddEdge(1, 4);
 
-        MuseumTestCase triplePathCase = new MuseumTestCase(1, triplePath, new int[] { 3, 1, 1, 1, 3 }, new int[] { 0 }, new int[] { 4 }, 3, checkRoutes, "Trzy ścieżki - wszystkie ścieżki");
-        MuseumTestCase doublePathCase = new MuseumTestCase(1, triplePath, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0, 4 }, new int[] { 0, 4 }, 2, checkRoutes, "Trzy ścieżki - tylko wejściowo-wyjściowe");
-        MuseumTestCase singleVertexCase1 = new MuseumTestCase(1, triplePath, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0 }, new int[] { 0 }, 1, checkRoutes, "Trzy ścieżki - początek wejściowo-wyjściowy");
-        MuseumTestCase singleVertexCase2 = new MuseumTestCase(1, triplePath, new int[] { 2, 1, 1, 1, 2 }, new int[] { 0 }, new int[] { 4 }, 2, checkRoutes, "Trzy ścieżki - maksymalnie dwie ścieżki");
-        MuseumTestCase doubledPathCase = new MuseumTestCase(1, triplePath, new int[] { 6, 2, 2, 2, 6 }, new int[] { 0 }, new int[] { 4 }, 6, checkRoutes, "Trzy ścieżki - wszystkie ścieżki po dwa razy");
-        MuseumTestCase almostDoubledPathCase = new MuseumTestCase(1, triplePath, new int[] { 6, 2, 2, 2, 5 }, new int[] { 0 }, new int[] { 4 }, 5, checkRoutes, "Trzy ścieżki - dwie ścieżki po dwa razy i jedna raz (ograniczenie na ujściu)");
-        MuseumTestCase almostDoubledPathCase2 = new MuseumTestCase(1, triplePath, new int[] { 5, 2, 2, 2, 6 }, new int[] { 0 }, new int[] { 4 }, 5, checkRoutes, "Trzy ścieżki - dwie ścieżki po dwa razy i jedna raz (ograniczenie na wejściu)");
-        MuseumTestCase middleVertexLimit = new MuseumTestCase(1, crossing, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0, 1 }, new int[] { 2, 3 }, 1, checkRoutes, "Gwiazda - ograniczenie do jeden w centrum");
+            MuseumTestCase triplePathCase = new MuseumTestCase(1, triplePath, new int[] { 3, 1, 1, 1, 3 }, new int[] { 0 }, new int[] { 4 }, 3, checkRoutes, "Trzy ścieżki - wszystkie ścieżki");
+            MuseumTestCase doublePathCase = new MuseumTestCase(1, triplePath, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0, 4 }, new int[] { 0, 4 }, 2, checkRoutes, "Trzy ścieżki - tylko wejściowo-wyjściowe");
+            MuseumTestCase singleVertexCase1 = new MuseumTestCase(1, triplePath, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0 }, new int[] { 0 }, 1, checkRoutes, "Trzy ścieżki - początek wejściowo-wyjściowy");
+            MuseumTestCase singleVertexCase2 = new MuseumTestCase(1, triplePath, new int[] { 2, 1, 1, 1, 2 }, new int[] { 0 }, new int[] { 4 }, 2, checkRoutes, "Trzy ścieżki - maksymalnie dwie ścieżki");
+            MuseumTestCase doubledPathCase = new MuseumTestCase(1, triplePath, new int[] { 6, 2, 2, 2, 6 }, new int[] { 0 }, new int[] { 4 }, 6, checkRoutes, "Trzy ścieżki - wszystkie ścieżki po dwa razy");
+            MuseumTestCase almostDoubledPathCase = new MuseumTestCase(1, triplePath, new int[] { 6, 2, 2, 2, 5 }, new int[] { 0 }, new int[] { 4 }, 5, checkRoutes, "Trzy ścieżki - dwie ścieżki po dwa razy i jedna raz (ograniczenie na ujściu)");
+            MuseumTestCase almostDoubledPathCase2 = new MuseumTestCase(1, triplePath, new int[] { 5, 2, 2, 2, 6 }, new int[] { 0 }, new int[] { 4 }, 5, checkRoutes, "Trzy ścieżki - dwie ścieżki po dwa razy i jedna raz (ograniczenie na wejściu)");
+            MuseumTestCase middleVertexLimit = new MuseumTestCase(1, crossing, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0, 1 }, new int[] { 2, 3 }, 1, checkRoutes, "Gwiazda - ograniczenie do jeden w centrum");
 
-        MuseumTestCase centerToCornersGrid = new MuseumTestCase(1, grid5, new int[]
-            {
+            MuseumTestCase centerToCornersGrid = new MuseumTestCase(1, grid5, new int[]
+                {
             1,3,3,3,2,
             0,3,0,0,0,
             0,4,6,1,1,
             0,1,0,0,1,
             1,1,0,0,1
-            }, new int[] { 12 }, new int[] { 0, 4, 20, 24 }, 5, checkRoutes, "Siatka 5x5 - od środka na zewnątrz");
+                }, new int[] { 12 }, new int[] { 0, 4, 20, 24 }, 5, checkRoutes, "Siatka 5x5 - od środka na zewnątrz");
 
-        MuseumTestCase cornersToCenterGrid = new MuseumTestCase(1, grid5, new int[]
+            MuseumTestCase cornersToCenterGrid = new MuseumTestCase(1, grid5, new int[]
             {
             1,3,3,3,2,
             0,3,0,0,0,
@@ -171,19 +171,18 @@ public class RoutesTests : TestModule
             }, new int[] { 0, 4, 20, 24 }, new int[] { 12 }, 5, checkRoutes, "Siatka 5x5 - od zewnątrz do środka");
 
         TestSet set = new TestSet(new Museum(), testSetName);
-        set.TestCases.Add(triplePathCase);
-        set.TestCases.Add(doublePathCase);
-        set.TestCases.Add(singleVertexCase1);
-        set.TestCases.Add(singleVertexCase2);
-        set.TestCases.Add(doubledPathCase);
-        set.TestCases.Add(almostDoubledPathCase);
-        set.TestCases.Add(almostDoubledPathCase2);
-        set.TestCases.Add(middleVertexLimit);
-        set.TestCases.Add(centerToCornersGrid);
-        set.TestCases.Add(cornersToCenterGrid);
-        set.TestCases.Add(RandomTest(500, 1337, 15, 383, checkRoutes));
-        set.TestCases.Add(RandomTest(750, 2021, 45, 46, checkRoutes));
-        set.TestCases.Add(RandomTest(1000, 1410, 110, 680, checkRoutes));
+            set.TestCases.Add(triplePathCase);
+            set.TestCases.Add(doublePathCase);
+            set.TestCases.Add(singleVertexCase1);
+            set.TestCases.Add(singleVertexCase2);
+            set.TestCases.Add(doubledPathCase);
+            set.TestCases.Add(almostDoubledPathCase);
+            set.TestCases.Add(almostDoubledPathCase2);
+            set.TestCases.Add(middleVertexLimit);
+            set.TestCases.Add(centerToCornersGrid);
+            set.TestCases.Add(cornersToCenterGrid);
+            set.TestCases.Add(RandomTest(500, 1337, 15, 383, checkRoutes));
+            set.TestCases.Add(RandomTest(750, 2021, 45, 46, checkRoutes));
         return set;
         }
 
