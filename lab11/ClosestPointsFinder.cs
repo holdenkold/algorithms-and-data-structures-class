@@ -24,63 +24,57 @@ namespace ASD
         /// <returns>
         /// Znaleziona najbliżej położona para punktów. Jeżeli jest kilka należy zwrócić dowolną.
         /// </returns>
-        public (Point P1, Point P2) findClosestPoints(Point[] points)
+        public (Point p1, Point p2) findClosestPoints(Point[] points)
         {
             if (points.Length == 2)
                 return (points[0], points[1]);
 
             var sorted_points = points.OrderBy(p => p.X).ToArray();
-
-            findClosestPointsRec(sorted_points, out (Point, Point) min_dist_points);
-            return min_dist_points;
+            (Point p1, Point p2, double dist) min_dist_points = findClosestPointsRec(sorted_points);
+            return (min_dist_points.p1, min_dist_points.p2);
         }
 
         public double distnace(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
-        public double findClosestPointsRec(Point[] points, out (Point, Point) p)
+        public (Point p1, Point p2, double dist) findClosestPointsRec(Point[] points)
         {
             if (points.Length == 2)
-            {
-                p = (points[0], points[1]);
-                return distnace(points[0], points[1]);
-            }
+                return (points[0], points[1], distnace(points[0], points[1]));
 
-            double dMin;
-            int x_mid = points.Length / 2;
-            int make_even = points.Length % 2 == 0 ? 0 : 1;
-            double dL = findClosestPointsRec(points.Take(x_mid + make_even).ToArray(), out (Point, Point) l);
-            double dR = findClosestPointsRec(points.Skip(x_mid).ToArray(), out (Point, Point) r);
-
-            if (dL < dR)
+            double x_mid;
+            int mid = points.Length / 2;
+            int make_even;
+            if (points.Length % 2 == 0)
             {
-                dMin = dL;
-                p = l;
+                make_even = 0;
+                x_mid = (points[points.Length / 2].X + points[points.Length / 2 - 1].X) / 2;
             }
             else
             {
-                dMin = dR;
-                p = r;
+                make_even = 1;
+                x_mid = points[(points.Length - 1) / 2].X;
             }
 
-            var Band = points.Where(k => Math.Abs(k.X - x_mid) <= dMin);
+            var dL = findClosestPointsRec(points.Take(mid + make_even).ToArray());
+            var dR = findClosestPointsRec(points.Skip(mid).ToArray());
+
+            (Point p1, Point p2, double dist) dMin = dL.dist < dR.dist ? dL : dR;
+
+            var Band = points.Where(k => Math.Abs(k.X - x_mid) <= dMin.dist);
+
             Point[] sortedBand = Band.OrderBy(b => b.Y).ToArray();
-            for (int i = 0; i < sortedBand.Length; i++)
+            for (int i = 0; i < sortedBand.Length - 1; i++)
             {
                 for (int j = i + 1; j < sortedBand.Length; j++)
                 {
                     double difference = Math.Abs(sortedBand[i].Y - sortedBand[j].Y);
-                    if (difference >= dMin)
-                        continue;
-                    else if(distnace(sortedBand[i], sortedBand[j]) < dMin)
-                    {
-                        p = (sortedBand[i], sortedBand[j]);
-                        dMin = distnace(sortedBand[i], sortedBand[j]);
-                    }
+
+                    if (difference < dMin.dist && distnace(sortedBand[i], sortedBand[j]) < dMin.dist)
+                        dMin = (sortedBand[i], sortedBand[j], distnace(sortedBand[i], sortedBand[j]));
                 }
             }
-
             return dMin;
         }
     }
