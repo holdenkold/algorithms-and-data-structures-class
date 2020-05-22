@@ -42,6 +42,7 @@ namespace ASD_2020_12
 
         // ETap I
         public Dictionary<char, string> codes = new Dictionary<char, string>();
+        public StringBuilder encoderedString = new StringBuilder(); 
         /// <summary>
         /// Metoda tworzy drzewo Huffmana dla zadanego tekstu
         /// </summary>
@@ -133,6 +134,7 @@ namespace ASD_2020_12
             if (root == null || content == null || content.Length == 0)
                 throw new ArgumentNullException("invalid inputs");
 
+            codes = new Dictionary<char, string>();
             StringBuilder code = new StringBuilder("");
             GetCodes(root, code, 0);
 
@@ -159,7 +161,40 @@ namespace ASD_2020_12
         /// <returns>Odtworzony tekst</returns>
         public string Decompress(HuffmanNode root, BitArray encoding)
         {
-            return null;
+            if (root == null || encoding == null || encoding.Length == 0)
+                throw new ArgumentNullException("invalid inputs");
+
+            encoderedString = new StringBuilder();
+            if (root.Left == null && root.Right == null && encoding.Cast<bool>().Any(x => x == true))
+                throw new ArgumentException("incorrect encoding");
+
+            Decode(root, root, encoding, 0);
+            return encoderedString.ToString();
+        }
+
+        private void Decode(HuffmanNode node, HuffmanNode root, BitArray encoding, int idx)
+        {
+            if (idx == encoding.Length  && (node.Left != null || node.Right != null))
+            {
+                throw new ArgumentException("encoding doesnt finish at leave");
+            }
+            if (idx == encoding.Length - 1)
+            { 
+                encoderedString.Append(node.Character);
+                return;
+            }
+
+            if (node.Left == null && node.Right == null)
+            {
+                encoderedString.Append(node.Character);
+                Decode(root, root, encoding, idx + 1);
+                return;
+            }
+
+            if (encoding[idx])
+                Decode(node.Right, root, encoding, idx + 1);
+            else
+                Decode(node.Left, root, encoding, idx + 1);
         }
 
     }
