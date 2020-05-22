@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Activation;
 using System.Text;
 
 namespace ASD_2020_12
@@ -11,7 +13,7 @@ namespace ASD_2020_12
     /// </summary>
     public class HuffmanPriorityQueue : MarshalByRefObject
     {
-        private readonly ASD.Graphs.PriorityQueue<HuffmanNode, long> queue = 
+        private readonly ASD.Graphs.PriorityQueue<HuffmanNode, long> queue =
             new ASD.Graphs.PriorityQueue<HuffmanNode, long>((lhs, rhs) => lhs.Key.Frequency < rhs.Key.Frequency);
 
         public bool Put(HuffmanNode node) => queue.Put(node, node.Frequency); // Dodaje węzeł Huffmana do kolejki
@@ -38,8 +40,8 @@ namespace ASD_2020_12
     public class Huffman : MarshalByRefObject
     {
 
-    // ETap I
-
+        // ETap I
+        public Dictionary<char, string> codes = new Dictionary<char, string>();
         /// <summary>
         /// Metoda tworzy drzewo Huffmana dla zadanego tekstu
         /// </summary>
@@ -47,10 +49,78 @@ namespace ASD_2020_12
         /// <returns>Drzewo Huffmana</returns>
         public HuffmanNode CreateHuffmanTree(string baseText)
         {
-            return null;
+            if (baseText == null || baseText.Length == 0)
+                throw new ArgumentNullException("invalid string");
+
+            var counter = Counter(baseText);
+
+            HuffmanPriorityQueue pq = new HuffmanPriorityQueue();
+
+            //var orderedCount = counter.OrderBy(x => x.Value);
+            foreach (var c in counter)
+            {
+                var hn = new HuffmanNode();
+                hn.Character = c.Key;
+                hn.Frequency = c.Value;
+                hn.Left = null;
+                hn.Right = null;
+                pq.Put(hn);
+            }
+
+            while (pq.Count > 1)
+            {
+                var t1 = pq.Get();
+                var t2 = pq.Get();
+
+                var hn = new HuffmanNode();
+                hn.Frequency = t1.Frequency + t2.Frequency;
+                hn.Left = t1;
+                hn.Right = t2;
+                pq.Put(hn);
+            }
+
+            return pq.Get();
         }
 
-    // Etap II
+        private Dictionary<char, int> Counter(string text)
+        {
+            Dictionary<char, int> Counter = new Dictionary<char, int>();
+            foreach (var c in text)
+            {
+                if (Counter.ContainsKey(c))
+                    Counter[c]++;
+                else
+                    Counter[c] = 1;
+            }
+
+            return Counter;
+        }
+
+        private void GetCodes(HuffmanNode root, StringBuilder code, int level)
+        {
+            if (root == null)
+                return;
+
+            if (level == 0 && root.Left == null && root.Right == null)
+            {
+                codes[root.Character] = "0";
+                return;
+            }
+
+            if (root.Left == null && root.Right == null)
+            {
+                codes[root.Character] = code.ToString();
+            }
+            else
+            {
+                GetCodes(root.Left, code.Append("0"), level + 1);
+                code[code.Length - 1] = '1';
+                GetCodes(root.Right, code, level + 1);
+            }
+            return;
+        }
+
+        // Etap II
 
         /// <summary>
         /// Metoda dokonuje kompresji Huffmana zadanego tekstu
@@ -60,10 +130,26 @@ namespace ASD_2020_12
         /// <returns>Skompresowany tekst</returns>
         public BitArray Compress(HuffmanNode root, string content)
         {
-            return null;
+            if (root == null || content == null || content.Length == 0)
+                throw new ArgumentNullException("invalid inputs");
+
+            StringBuilder code = new StringBuilder("");
+            GetCodes(root, code, 0);
+
+            StringBuilder convertedCodes = new StringBuilder();
+
+            foreach (var c in content)
+            {
+                if (!codes.ContainsKey(c))
+                    throw new ArgumentOutOfRangeException("key is not present in a dictionary");
+                convertedCodes.Append(codes[c]);
+            }
+
+            return new BitArray(convertedCodes.ToString().Select(s => s == '1').ToArray());
         }
 
-    // Etap III
+
+        // Etap III
 
         /// <summary>
         /// Metoda dokonuje dekompresji tekstu skompresowanego metodą Huffmana
